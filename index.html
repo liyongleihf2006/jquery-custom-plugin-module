@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-1.9.1.min.js"></script>
+    <style>
+        .func{
+            color: red;
+        }
+    </style>
+    <script src="jquery-plugin-module-custom.js"></script>
+</head>
+<body>
+<div class="abc"></div>
+<div class="abc"></div>
+<div class="abc"></div>
+<div class="abc"></div>
+<div class="abc" id="aaa"></div>
+    <script>
+        var name=$('.abc').func({name:'aaa',afterRender:function(item){
+            console.info(item,'加载完毕了');
+        }}).func('save','haha').func('update',{name:'a',age:'50'}).func('getName',{index:1});
+        console.info(name);
+    </script>
+</body>
+</html>
