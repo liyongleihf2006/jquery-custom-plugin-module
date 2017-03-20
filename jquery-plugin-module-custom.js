@@ -2,6 +2,9 @@
  * Created by LiYonglei on 2016/2/19.
  */
 (function($){
+    if($.fn.func){
+        return;
+    }
     var setMethods={
         save:save,
         update:update,
@@ -11,31 +14,32 @@
         getName:getName
     }
     $.fn.func=function(){
-        var params;
-        var method;
-        if(!arguments.length|| typeof arguments[0] == 'object'){
-            this.data('func',$.extend({},$.fn.func.default,arguments[0]));
-            params=this.data('func');
-            return this.each(function(idx,item){
-                var _this=init.call(item,params);
-                render.call(_this);
+        var args=arguments,params,method;
+        if(!args.length|| typeof args[0] == 'object'){
+            return this.each(function(idx){
+                var $self=$(this);
+                $self.data('func',$.extend(true,{},$.fn.func.default,args[0]));
+                params=$self.data('func');
+                _init.call( $self,params);
+                _render.call($self);
             });
         }else{
             if(!$(this).data('func')){
-                throw new Error('没初始化');
+                throw new Error('You has not init func!');
             }
-            params=Array.prototype.slice.call(arguments,1);
-            if (setMethods.hasOwnProperty(arguments[0])){
-                method=setMethods[arguments[0]];
-                return this.each(function(idx,item){
-                    var _this=method.apply(item,params);
-                    render.call(_this);
+            params=Array.prototype.slice.call(args,1);
+            if (setMethods.hasOwnProperty(args[0])){
+                method=setMethods[args[0]];
+                return this.each(function(idx){
+                    var $self=$(this);
+                    method.apply($self,params);
+                    _render.call($self);
                 });
-            }else if(getMethods.hasOwnProperty(arguments[0])){
-                method=getMethods[arguments[0]];
+            }else if(getMethods.hasOwnProperty(args[0])){
+                method=getMethods[args[0]];
                 return method.apply(this,params);
             }else{
-                throw new Error('没有这个方法');
+                throw new Error('There is no such method');
             }
         }
     };
@@ -48,33 +52,39 @@
             console.info('afterRender');
         }
     };
-    function init(params){
-        return this;
+    function _init(params){
+        var $self=this;
+        return $self;
     }
     function save(name){
-        $.extend($(this).data('func'),{name:name});
-        return this;
+        var $self=this;
+        $.extend($self.data('func'),{name:name});
+        return $self;
     }
     function update(params){
-        $.extend($(this).data('func'),params);
+        var $self=this;
+        $.extend($self.data('func'),params);
         return this;
     }
     function destory(b){
-        var params=$(this).data('func');
-        $(this).removeClass(params.class).removeData('func');
+        var $self=this;
+        var params=$self.data('func');
+        $self.removeClass(params.class).removeData('func');
         if(b){
-            $(this).remove();
+            $self.remove();
         }else{
-            return this;
+            return $self;
         }
     }
-    function render(){
-        var params=$(this).data('func');
-        $(this).addClass(params.class).text(params.name);
-        params.afterRender(this);
+    function _render(){
+        var $self=this;
+        var params=$self.data('func');
+        $self.addClass(params.class).text(params.name);
+        params.afterRender($self);
     }
     function getName(params){
+        var $self=this;
         console.info(params);
-        return this.data('func').name;
+        return $self.data('func').name;
     }
 }(jQuery))
